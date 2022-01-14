@@ -1,0 +1,9 @@
+{
+    "debug_mode": 1,
+    "dataset_name": "mnist",
+    "case_num": 2,
+    "generate_mode": "seq",
+    "data_dir": "data",
+    "timeout": 300,
+    "use_heuristic": 1
+}

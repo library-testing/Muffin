@@ -1,12 +1,13 @@
 import numpy as np
 from pathlib import Path
 from PIL import Image
+import sys
 import os
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 import keras
 
 
-dataset_name = 'fashion_mnist'
+dataset_name = sys.argv[1] # e.g. 'fashion_mnist'
 
 
 if dataset_name == 'cifar10':
@@ -108,9 +109,9 @@ if dataset_name == 'price':
 instance_num = 10
 
 dataset_dir = Path(".") / dataset_name
-dataset_dir.mkdir(exists_ok=True)
-np.savez("inputs.npz", x_test[:instance_num])
-np.savez("ground_truths.npz", y_test[:instance_num])
+dataset_dir.mkdir(exist_ok=True)
+np.savez(str(dataset_dir / "inputs.npz"), x_test[:instance_num])
+np.savez(str(dataset_dir / "ground_truths.npz"), y_test[:instance_num])
 
 print(x_test[:instance_num].shape)
 print(y_test[:instance_num].shape)

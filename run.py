@@ -87,7 +87,7 @@ class TrainingDebugger(object):
                                                                                                                                        ok_backends=ok_backends,
                                                                                                                                        loss=loss,
                                                                                                                                        optimizer=optimizer)
-            print(f'Training结束：ok_backends={ok_backends}')
+            print(f'Training结束: ok_backends={ok_backends}')
 
             self.__db_manager.record_status(model_id, status)
 
@@ -110,7 +110,7 @@ class TrainingDebugger(object):
         return self.__selector.coverage()
 
 
-def main(dataset_name, data_dir, debug_mode):
+def main(testing_config):
     config = {
         'model': {
             'var': {
@@ -131,18 +131,18 @@ def main(dataset_name, data_dir, debug_mode):
             'instance_num': 10,
             'element_val_range': (0, 100),
         },
-        'db_path': str(Path.cwd() / data_dir / f'{dataset_name}.db'),
-        'output_dir': str(Path.cwd() / data_dir / f'{dataset_name}_output'),
-        'report_dir': str(Path.cwd() / data_dir / f'{dataset_name}_report'),
+        'db_path': str(Path.cwd() / testing_config['data_dir'] / f'{testing_config["dataset_name"]}.db'),
+        'output_dir': str(Path.cwd() / testing_config['data_dir'] / f'{testing_config["dataset_name"]}_output'),
+        'report_dir': str(Path.cwd() / testing_config['data_dir'] / f'{testing_config["dataset_name"]}_report'),
         'backends': ['tensorflow', 'theano', 'cntk'],
         'distance_threshold': 0,
     }
 
-    DEBUG_MODE = debug_mode
-    CASE_NUM = 50
-    TIMEOUT = 300  # 秒
-    USE_HEURISTIC = True  # 是否开启启发式规则
-    GENERATE_MODE = 'template'  # seq\merging\dag\template
+    DEBUG_MODE = testing_config["debug_mode"]
+    CASE_NUM = testing_config["case_num"]
+    TIMEOUT = testing_config["timeout"]  # 秒
+    USE_HEURISTIC = bool(testing_config["use_heuristic"])  # 是否开启启发式规则
+    GENERATE_MODE = testing_config["generate_mode"]  # seq\merging\dag\template
 
     debugger = TrainingDebugger(config, USE_HEURISTIC, GENERATE_MODE, TIMEOUT)
     start_time = datetime.datetime.now()
@@ -153,32 +153,32 @@ def main(dataset_name, data_dir, debug_mode):
             print(f"######## Round {i} ########")
             try:
                 print("------------- generation -------------")
-                model_id, exp_dir, ok_backends = debugger.run_generation_for_dataset(dataset_name)
+                model_id, exp_dir, ok_backends = debugger.run_generation_for_dataset(testing_config["dataset_name"])
                 print("------------- detection -------------")
                 ok_backends = debugger.run_detection(model_id, exp_dir, ok_backends)
             except Exception:
                 import traceback
                 traceback.print_exc()
 
-    elif DEBUG_MODE == 2:  # 指定数据集 + 指定模型
-        import json
-        model_name = 'lenet5-fashion-mnist_origin0'
-        model_info_path = Path("temp") / f"{model_name}.json"
-        initial_weight_dir = str(Path("temp") / f"{model_name}_weights")
-        loss = 'mean_absolute_error'
-        optimizer = 'sgd'
-        # dataset_name = 'mnist'
+    # elif DEBUG_MODE == 2:  # 指定数据集 + 指定模型
+    #     import json
+    #     model_name = 'lenet5-fashion-mnist_origin0'
+    #     model_info_path = Path("temp") / f"{model_name}.json"
+    #     initial_weight_dir = str(Path("temp") / f"{model_name}_weights")
+    #     loss = 'mean_absolute_error'
+    #     optimizer = 'sgd'
+    #     # dataset_name = 'mnist'
 
-        with open(str(model_info_path), "r") as f:
-            model_info = json.load(f)
-        try:
-            print("------------- generation -------------")
-            model_id, exp_dir, ok_backends = debugger.run_generation(model_info=model_info, initial_weight_dir=initial_weight_dir, dataset_name=dataset_name)
-            print("------------- detection -------------")
-            ok_backends = debugger.run_detection(model_id, exp_dir, ok_backends, loss, optimizer)
-        except Exception:
-            import traceback
-            traceback.print_exc()
+    #     with open(str(model_info_path), "r") as f:
+    #         model_info = json.load(f)
+    #     try:
+    #         print("------------- generation -------------")
+    #         model_id, exp_dir, ok_backends = debugger.run_generation(model_info=model_info, initial_weight_dir=initial_weight_dir, dataset_name=testing_config["dataset_name"])
+    #         print("------------- detection -------------")
+    #         ok_backends = debugger.run_detection(model_id, exp_dir, ok_backends, loss, optimizer)
+    #     except Exception:
+    #         import traceback
+    #         traceback.print_exc()
 
     else:  # 随机数据集 + 随机模型
         for i in range(CASE_NUM):
@@ -196,14 +196,18 @@ def main(dataset_name, data_dir, debug_mode):
     time_delta = end_time - start_time
     h, m, s = get_HH_mm_ss(time_delta)
     print(f"R-CRADLE is done: Time used: {h} hour,{m} min,{s} sec")
-    coverage_rate, selected_map = debugger.get_coverage()
-    print(f"Layer coverage is: {coverage_rate}")
-    with open("runnning_info.txt", "a") as f:
-        print(f"{dataset_name} is done: Time used: {h} hour,{m} min,{s} sec", file=f)
-        print(f"Layer coverage is: {coverage_rate}\n", file=f)
+    # coverage_rate, selected_map = debugger.get_coverage()
+    # print(f"Layer coverage is: {coverage_rate}")
+    # with open("runnning_info.txt", "a") as f:
+    #     print(f"{dataset_name} is done: Time used: {h} hour,{m} min,{s} sec", file=f)
+    #     print(f"Layer coverage is: {coverage_rate}\n", file=f)
 
 
 if __name__ == '__main__':
-    datasets = ['cifar10', 'mnist', 'fashion_mnist', 'imagenet', 'sinewave', 'price']
-    for dataset in datasets:
-        main(dataset, 'normal_data', debug_mode=1)
+    import json
+    with open(str("testing_config.json"), "r") as f:
+        testing_config = json.load(f)
+    main(testing_config)
+    # datasets = ['cifar10', 'mnist', 'fashion_mnist', 'imagenet', 'sinewave', 'price']
+    # for dataset in datasets:
+    #     main(dataset, 'data', debug_mode=1)
