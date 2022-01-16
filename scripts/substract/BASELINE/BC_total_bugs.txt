@@ -1,0 +1,1 @@
+{'tensorflow': {'global_max_pooling2D'}, 'theano': {'max_pooling2D'}, 'cntk': set()}

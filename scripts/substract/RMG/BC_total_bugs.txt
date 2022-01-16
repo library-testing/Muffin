@@ -1,0 +1,1 @@
+{'tensorflow': set(), 'theano': set(), 'cntk': {'LSTM'}}
