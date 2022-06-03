@@ -134,5 +134,12 @@ python clear_data.py [DATASET_NAME]
 
 ## Citation
 
-Coming soon...
+```
+@inproceedings{gu2022muffin,
+  title={Muffin: Testing Deep Learning Libraries via Neural Architecture Fuzzing},
+  author={Gu Jiazhen, Luo Xuchuan, Zhou Yangfan, Wang Xin},
+  booktitle={International Conference on Software Engineering (ICSE’22)},
+  year={2022}
+}
+```
 
