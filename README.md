@@ -30,6 +30,8 @@ We use three widely-used DL libraries (*i.e.*, ***TensorFlow***, ***Theano***, a
 
 In order to facilitate other researchers to reproduce ***Muffin***, we provide ***docker*** images for each experiments (*i.e.*, E1 ~ E5), named `librarytesting/muffin` with tags from `E1` to `E5` respectively.
 
+If you don't want to reproduce the experiments, you can directly get the output of E1 in [E1_output.zip](https://drive.google.com/file/d/1_dI0UjHKYosPkrIVC6kQMTB3GkCQHHBc/view?usp=sharing).
+
 
 
 ## Datasets(Optional)
@@ -129,7 +131,6 @@ Use the following command in `/data/data` to delete a set of testing results ( *
 ```shell
 python clear_data.py [DATASET_NAME]
 ```
-
 
 
 ## Citation
